@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+      .popup {
+        position: absolute;
+        background-color: white;
+        border: 1px solid black;
+        padding: 10px;
+        z-index: 9999;
+        justify-content: center;
+        max-width: 45%;
+        border-radius: 5px;
+        overflow-y: auto;
+        max-height: 50vh;
+        padding: 15px 15px 15px 15px;
+        background-color: #d3d3d3;
+      }
+      .popup > p {
+        margin: 10px 10px 10px 10px;
+      }
+
+      .dropdown {
+        position: absolute;
+        z-index: 9;
+        top: 10px;
+        right: 10px;
+      }
+
+      .popup .close-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 5px;
+        font-size: 12px;
+        color: #aaa;
+        cursor: pointer;
+      }
+
+      .popup .close-button {
+        color: #000;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+      }
+      body {
+        padding-left: 30px;
+        overflow: hidden;
+        z-index: 1;
+        background-size: cover;
+        background-color: #201f1f;
+        background-size: 300% auto;
+        animation: gradient 20s ease infinite;
+      }
+
+      #tree-container {
+        position: absolute;
+        width: 99%;
+        right: 10px;
+        height: 80vh;
+        z-index: 3;
+        transition: width 0.4s ease-out;
+        border-radius: 10px;
+      }
+
+      #editor {
+        width: 30%;
+        float: left;
+        height: 80vh;
+        display: flex;
+        flex-direction: row;
+      }
+
+      #text-content {
+        flex: 1;
+        max-width: 0;
+        float: left;
+        height: 95%;
+        overflow-y: auto;
+        border-radius: 10px;
+        transition: max-width 0.5s ease-out;
+        background-color: white;
+      }
+
+      #text-content > p {
+        overflow-y: auto;
+      }
+
+      #input-file {
+        width: 100%;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .node {
+        cursor: pointer;
+      }
+
+      .overlay {
+        background-color: white;
+        border-radius: 10px;
+        width: 100%;
+      }
+
+      .node circle {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+      }
+
+      .node text {
+        font-size: 10px;
+        font-family: sans-serif;
+      }
+
+      .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 1.5px;
+      }
+
+      .circle-button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-size: 24px;
+        color: white;
+        background-color: gray;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: transform 0.5s;
+        right: 0;
+        left: auto;
+        z-index: 4;
+      }
+
+      .circle-button:hover {
+        transform: scale(1.2) translate(-50%, -50%);
+      }
+
+      .node > text {
+        font-size: 15px;
+      }
+
+      .node .nodeText {
+        font-size: 30px;
+      }
+
+      .rotate {
+        transform: translate(-50%, -50%) rotate(180deg);
+      }
+
+      #panel {
+        position: relative;
+        flex: 0.075;
+      }
+
+      #main-selection {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9;
+      }
+
+      .styled-input {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        color: #333;
+        z-index: 2;
+        background-color: #d3d3d3;
+      }
+
+      .styled-input::file-selector-button {
+        color: #fff;
+        background-color: #0077be;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        outline: none;
+      }
+
+      .styled-input:hover::file-selector-button {
+        background-color: #000000;
+      }
+
+      .title {
+        font-family: "Montserrat", sans-serif;
+        font-size: 3rem;
+        font-weight: bold;
+        text-align: center;
+        color: #0077be;
+        margin-bottom: 2rem;
+      }
+
+      .styled-input::placeholder {
+        color: white;
+      }
+
+      .link {
+        stroke: #333333;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        transform: scale(0.5);
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      #toggleText {
+        color: #0077be;
+      }
+
+      #apiToggle {
+        text-align: center;
+        margin-left: 10px;
+      }
+
+      .popup #proof-div {
+        margin-top: 10px;
+        border-radius: 20px;
+        color: white;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .popup tr {
+        border-bottom: 1px solid white;
+        height: 50px;
+        padding: 0 25px 0 5px;
+      }
+      .popup table {
+        border-collapse: collapse;
+      }
+      .popup h1 {
+        text-align: center;
+      }
+
+      .stackTable {
+        display: inline-table;
+        margin-right: 0 !important;
+        width: 100%;
+      }
+
+      #prev-proof,
+      #next-proof {
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 0 !important;
+      }
+
+      #nav-div {
+        display: flex;
+      }
+
+      #proof-placeholder {
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 20px;
+      }
+
+      .value-placeholder,
+      .comment-placeholder,
+      .group-placeholder {
+        font-weight: bold;
+      }
+
+      .dropdown-menu {
+        background-color: white;
+      }
+
+      .dropdown-toggle {
+        color: #fff;
+        background-color: #0077be;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        font-size: 16px;
+      }
+
+      #search-div {
+        position: absolute;
+        width: 300px;
+        height: 50px;
+        background-color: #d3d3d3;
+        bottom: 0;
+        left: 0;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-evenly;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        padding-bottom: 5px;
+      }
+
+      #search-input {
+        margin-right: 10px;
+        margin-left: 5px;
+        height: 40px;
+        width: 250px;
+        border: none;
+        border-radius: 5px;
+        margin-top: 5px;
+      }
+      .search-button {
+        background-color: #2196f3;
+        border: none;
+        display: inline-block;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        margin-top: 5px;
+      }
+
+      #search-matches {
+        color: white;
+        margin-top: 1px;
+        display: none;
+      }
+
+      .search-icon {
+        background-image: url("./search.png");
+        background-size: 100%;
+        background-repeat: no-repeat;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+      }
+
+      #about {
+        color: #fff;
+        background-color: #0077be;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        font-size: 16px;
+      }
+    </style>
+    <title>Metamath Visualization</title>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  </head>
+  <body>
+    <py-config> terminal = false </py-config>
+    <script src="tree.js"></script>
+    <py-script src="./verifier.py"></py-script>
+    <py-script src="./metamathParser.py"></py-script>
+    <py-script src="./customSyntaxParser.py"></py-script>
+
+    <div id="main-selection">
+      <div class="title">Metamath Visualization</div>
+      <div id="input-file">
+        <input class="styled-input" type="file" id="input" accept=".mm" />
+        <div id="apiToggle">
+          <div id="toggleText">Toggle API Usage</div>
+          <label class="switch">
+            <input type="checkbox" id="api-toggle" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div id="tree-container"></div>
+    <div id="editor">
+      <div id="text-content"></div>
+      <div id="panel">
+        <button id="toggle" class="circle-button rotate" hidden>&gt;</button>
+      </div>
+    </div>
+    <script>
+      const button = document.querySelector("#toggle");
+      button.addEventListener("click", function () {
+        button.classList.toggle("clicked");
+
+        const content = document.querySelector("#text-content");
+        const tree = document.querySelector("#tree-container");
+
+        if (content.style.maxWidth) {
+          content.style.maxWidth = null;
+          content.addEventListener("transitionend", function (event) {
+            const button = document.querySelector("#toggle");
+            if (!button.classList.contains("clicked")) {
+              content.style.border = null;
+              content.style.padding = "0 0 0 0";
+              tree.style.width = "99%";
+            }
+          });
+        } else {
+          content.style.maxWidth = "100%";
+          content.style.border = "1px solid black";
+          content.style.padding = "10px 10px 10px 10px";
+          tree.style.width = "69%";
+        }
+
+        if (button.classList.contains("clicked")) {
+          button.innerHTML = "&lt;";
+        } else {
+          button.innerHTML = "&gt;";
+        }
+      });
+    </script>
+  </body>
+</html>
