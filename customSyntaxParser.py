@@ -50,12 +50,6 @@ def getSectionComments(section):
 
 async def read_complete(event):
     metamath_file = event.target.result
-    title_div = document.querySelector('#main-selection')
-    title_div.style.position = "relative"
-    title_div.style.top = '0'
-    title_div.style.left = '0'
-    title_div.style.display = 'inline'
-    title_div.style.transform = 'null'
     if document.querySelector('#api-toggle').checked:
         try:
             url = "http://localhost:5000/metamath"
@@ -73,7 +67,8 @@ async def read_complete(event):
                     text_div.element.innerHTML = '<pre>' + response.get('nonComments') + '</pre>' +'<button id="about">About</button>'
                 else:
                     text_div.element.innerHTML = '<pre>' + response.get('nonComments') + '</pre>' 
-
+                    
+                fixTitleLayout()
                 js.treeJSON(json.dumps(about),response.get('data'), json.dumps(response.get('proofsStacks')))
         except Exception as e:
             createErrorDiv(str(e))
@@ -118,9 +113,18 @@ async def read_complete(event):
             text_div.element.innerHTML = '<pre>' + nonComments + '</pre>' 
         
         treeData = parseFile(metamath_file, allComments, data)
+        fixTitleLayout()
         js.treeJSON(json.dumps({"title":title,"description":description, "contributors":contributors }), treeData, json.dumps(proofsStacks))
 
 handleFileSelect()
+
+def fixTitleLayout():
+    title_div = document.querySelector('#main-selection')
+    title_div.style.position = "relative"
+    title_div.style.top = '0'
+    title_div.style.left = '0'
+    title_div.style.display = 'inline'
+    title_div.style.transform = 'null'
 
 def parseAboutPage(metamath):
     lTitleMarker = Literal('$( ~~~title')
