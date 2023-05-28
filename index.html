@@ -416,6 +416,25 @@
         border: none;
         font-size: 16px;
       }
+
+      #example {
+        color: #0077be;
+      }
+
+      #example-button {
+        color: #fff;
+        background-color: #0077be;
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        outline: none;
+      }
+
+      #example-button:hover {
+        background-color: #000000;
+      }
     </style>
     <title>Metamath Visualization</title>
     <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -441,6 +460,10 @@
           </label>
         </div>
       </div>
+      <div id="example">
+        Please select a file or use
+        <button id="example-button">the example flie</button>
+      </div>
     </div>
     <div id="tree-container"></div>
     <div id="editor">
@@ -451,6 +474,28 @@
     </div>
     <script>
       const button = document.querySelector("#toggle");
+      const exampleButton = document.getElementById("example-button");
+      const fileInput = document.getElementById("input");
+
+      exampleButton.addEventListener("click", function () {
+        fetch("example.mm")
+          .then((response) => response.text())
+          .then((fileContent) => {
+            const file = new File([fileContent], "example.mm", {
+              type: "text/plain",
+            });
+            const fileList = new DataTransfer();
+            fileList.items.add(file);
+            fileInput.files = fileList.files;
+
+            const event = new Event("change");
+            fileInput.dispatchEvent(event);
+          })
+          .catch((error) => {
+            console.error("Error loading file:", error);
+          });
+      });
+
       button.addEventListener("click", function () {
         button.classList.toggle("clicked");
 

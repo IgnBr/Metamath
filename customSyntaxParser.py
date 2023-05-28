@@ -125,6 +125,9 @@ def fixTitleLayout():
     title_div.style.left = '0'
     title_div.style.display = 'inline'
     title_div.style.transform = 'null'
+    example_div = document.querySelector('#example')
+    if example_div:
+        example_div.remove()
 
 def parseAboutPage(metamath):
     lTitleMarker = Literal('$( ~~~title')
@@ -163,6 +166,7 @@ def createErrorDiv(message):
     error_div.style.bottom = '0'
     error_div.style.left = '0'
     error_div.style.setProperty("border-radius", "10px")
+    error_div.style.setProperty("max-width", "50%")
     document.body.appendChild(error_div)
     def fade_out():
         error_div.style.opacity = '0'  
