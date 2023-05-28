@@ -516,7 +516,12 @@
           content.style.maxWidth = "100%";
           content.style.border = "1px solid black";
           content.style.padding = "10px 10px 10px 10px";
-          tree.style.width = "69%";
+          const mediaQuery = window.matchMedia("(max-width: 1420px)");
+          if (mediaQuery.matches) {
+            tree.style.width = "67%";
+          } else {
+            tree.style.width = "69%";
+          }
         }
 
         if (button.classList.contains("clicked")) {

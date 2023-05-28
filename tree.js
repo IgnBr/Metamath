@@ -81,8 +81,9 @@ treeJSON = (aboutPageData, data, proofsStacks, oldData = {}) => {
       .select("body")
       .append("div")
       .attr("class", "popup")
-      .style("left", d3.event.pageX + 10 + "px")
-      .style("top", d3.event.pageY + 10 + "px")
+      .style("left", "50%")
+      .style("top", "50%")
+      .style("transform", "translate(-50%, -50%)")
       .on("mousedown", function () {
         d3.event.stopPropagation();
       });
@@ -397,6 +398,8 @@ treeJSON = (aboutPageData, data, proofsStacks, oldData = {}) => {
 
   var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
 
+  zoomListener.scale(0.6);
+
   var baseSvg = d3
     .select("#tree-container")
     .append("svg")
@@ -559,8 +562,9 @@ treeJSON = (aboutPageData, data, proofsStacks, oldData = {}) => {
           .select("body")
           .append("div")
           .attr("class", "popup")
-          .style("left", d3.event.pageX + 10 + "px")
-          .style("top", d3.event.pageY + 10 + "px")
+          .style("left", "50%")
+          .style("top", "50%")
+          .style("transform", "translate(-50%, -50%)")
           .on("mousedown", function () {
             d3.event.stopPropagation();
           });
@@ -599,6 +603,7 @@ treeJSON = (aboutPageData, data, proofsStacks, oldData = {}) => {
         );
 
         if (stack) {
+          popup.style("min-width", "45%");
           let currentStep = 1;
           const data = [];
           let proof =
@@ -606,7 +611,6 @@ treeJSON = (aboutPageData, data, proofsStacks, oldData = {}) => {
           proof = proof.split("$=")[1];
           proof = proof.replace(/\$./g, "");
           const labels = proof.trim().split(" ");
-          console.log(d);
           labels.forEach((label, idx) =>
             data.push({
               label,

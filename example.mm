@@ -1,8 +1,9 @@
 $( ~~~title Proving that t=t $)
 $( ~~~description This is an example how using Modus Ponens rule you can prove that t=t $)
-$( ~~~contributor metamath.pdf authors $)
+$( ~~~contributor Contributor 1 $)
+$( ~~~contributor Contributor 2 $)
 
-$( ~~~section {"name":"Syntax needed for the proof"} $)
+$( ~~~section {"name":"Axiomatic Assertions"} $)
 $( ~~~comment {"ref":["0","+","=","->","(",")","term","wff","|-"]} Declare the constant symbols we will use $)
 $c 0 + = -> ( ) term wff |- $.
 $( ~~~comment {"ref":["v","t","s","P","Q"]} Declare the metavariables we will use $)
@@ -28,7 +29,7 @@ maj $e |- ( P -> Q ) $.
 mp $a |- Q $.
 $}
 $( section~~~ $)
-$( ~~~section {"name":"The Proof"} $)
+$( ~~~section {"name":"The 1st Proof"} $)
 $( ~~~comment {"ref":["th1"]} Prove a theorem $)
 th1 $p |- t = t $=
 $( Here is its proof: $)

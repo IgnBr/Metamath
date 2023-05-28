@@ -54,7 +54,14 @@ async def read_complete(event):
         try:
             url = "http://localhost:5000/metamath"
             headers = {"Content-Type": "text/plain; charset=utf-8"}
-            response =  await pyfetch(url=url,headers=headers,body=metamath_file, method="POST")
+            try:
+                response = await pyfetch(url=url,headers=headers,body=metamath_file, method="POST")
+            except Exception as e:
+                if str(e) == 'Failed to fetch':
+                    createErrorDiv('The API feature is currently unavailable in the remote environment. Please ensure that you are using the API feature locally to access its functionality.')
+                else:
+                    createErrorDiv(e)
+                return
             response = await response.json()
             if response.get('error') is not None:
                 error = response.get('error')
@@ -63,7 +70,7 @@ async def read_complete(event):
             else:
                 about = response.get('about')
                 text_div = Element("text-content")
-                if about.get('description') is not None or len(about.get('contributors')) > 0:
+                if about.get('description') != '' or len(about.get('contributors')) > 0:
                     text_div.element.innerHTML = '<pre>' + response.get('nonComments') + '</pre>' +'<button id="about">About</button>'
                 else:
                     text_div.element.innerHTML = '<pre>' + response.get('nonComments') + '</pre>' 
@@ -94,7 +101,9 @@ async def read_complete(event):
         data = []
         nonComments = ""
         allComments = []
+        sectionsFound = False
         for tokens, start, end in pattern.scanString(metamath_file):
+            sectionsFound = True
             args = json.loads(tokens.args)
             comments, metamathSyntax = getSectionComments(tokens.content)
             data.append((comments, args, metamathSyntax))
@@ -103,11 +112,16 @@ async def read_complete(event):
                 nonComments += "$( SECTION " + args["name"] + " $)\n" + metamathSyntax
             else:
                 nonComments += "\n$( SECTION " + args["name"] + " $)\n" + metamathSyntax
+                
+        if not sectionsFound:
+            createErrorDiv('The file you have selected does not include syntax needed for visualization')
+            raise Exception('The file you have selected does not include syntax needed for visualization')
         
         
         text_div = Element("text-content")
         title,description,contributors = parseAboutPage(metamath_file)
-        if description is not None or len(contributors) > 0:
+        
+        if description != '' or len(contributors) > 0:
             text_div.element.innerHTML = '<pre>' + nonComments + '</pre>' +'<button id="about">About</button>'
         else:
             text_div.element.innerHTML = '<pre>' + nonComments + '</pre>' 
@@ -175,4 +189,4 @@ def createErrorDiv(message):
         remove_div_callable = create_once_callable(remove_div)
         setTimeout(remove_div_callable, 3000)
     fade_out_callable = create_once_callable(fade_out)
-    setTimeout(fade_out_callable, 3000)
+    setTimeout(fade_out_callable, 6000)
